@@ -1,17 +1,20 @@
 from ortools.constraint_solver import pywrapcp
 import FlexibleJobShopData as fjsd
 
+solver = pywrapcp.Solver("flexible_jobshop")
 
 class TaskAlternative():
+    global solver
+
     def __init__(self, j):
-        solver = pywrapcp.Solver("flexible_jobshop")
         self.job_id = j
         self.alternative_variable = solver.IntVar()
         self.intervals = solver.IntervalVar()
 
 
 def FlexibleJobshop(data):
-    solver = pywrapcp.Solver("flexible_jobshop")
+    global solver
+
     machine_count = data.machine_count
     job_count = data.job_count
     horizon = data.horizon
@@ -85,7 +88,7 @@ def FlexibleJobshop(data):
     # whose job is to sequence interval variables.
 
     all_sequences=[]  # SequenceVar vector
-    for machine_id in range(0, machine_count):
+    for machine_id in all_machines:
         name='Machine {}'.format(machine_id)
         disj_ct=solver.DisjunctiveConstraint(
             machines_to_tasks[machine_id], name)
@@ -94,8 +97,8 @@ def FlexibleJobshop(data):
 
     # Creates array of end_times of jobs.
     all_ends=[]
-    for i in range(0, len(job_count)):
-        task_alt=jobs_to_tasks[job_id][-1]
+    for i in all_jobs:
+        task_alt=jobs_to_tasks[i][-1]
         for j in range(0, len(task_alt)):
             t=task_alt.intervals[j]
             all_ends.append(t)
